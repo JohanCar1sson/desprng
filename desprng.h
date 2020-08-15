@@ -8,4 +8,5 @@ typedef struct desprng_struct
 
 int create_identifier(unsigned long *nident);
 int initialize_prng(desprng_type *despairing, unsigned long nident);
+int make_prn(desprng_type *despairing, unsigned long icount, unsigned long *iprn);
 int check_type_sizes();

@@ -30,20 +30,29 @@ int main(int argc, char *argv[])
     initialize_prng(&despairing, nident);
 
     if (!(d3desdump = fopen("d3des.out", "w"))) return -1;
+    if (!(desprngdump = fopen("desprng.out", "w"))) return -1;
 
     for (itime = 0UL; itime < Ntime; itime++)
     {
-        if (itime) fprintf(d3desdump, "\n");
+        if (itime)
+        {
+            fprintf(d3desdump, "\n");
+            fprintf(desprngdump, "\n");
+        }
         for (icoll = 0; icoll < Ncoll; icoll++)
         {
             /* Make itime the high six bytes of icount, and icoll the low two bytes */
             icount = (itime << 16) + icoll;
             des((unsigned char *)&icount, (unsigned char *)&iprn);
-            fprintf(d3desdump, " %lX", iprn);
+            fprintf(d3desdump, " %016lX", iprn);
+            make_prn(&despairing, icount, &iprn);
+            fprintf(desprngdump, " %016lX", iprn);
         }
     }
     fprintf(d3desdump, "\n");
     fclose(d3desdump);
+    fprintf(desprngdump, "\n");
+    fclose(desprngdump);
 
     return 0;
 }
