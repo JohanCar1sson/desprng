@@ -2,8 +2,8 @@
 #include "desprng.h"
 
 /* These are the signatures for the modified d3des functions that we call directly */
-void _deskey(desprng_type *despairing, unsigned char *key);
-void _des(desprng_type *despairing, unsigned char *inblock, unsigned char *outblock);
+static void _deskey(desprng_type *despairing, unsigned char *key);
+static void _des(desprng_type *despairing, unsigned char *inblock, unsigned char *outblock);
 
 /* Takes the 56 least significant bits of an unsigned long and splits them into
    8 groups of 7 bits each. Each group becomes the 7 most signficant bits of a
@@ -106,7 +106,7 @@ int check_type_sizes()
  */
 
 /* These are the signatures for the modified d3des functions that we call indirectly */
-void _usekey(desprng_type *despairing, unsigned long *from);
+static void _usekey(desprng_type *despairing, unsigned long *from);
 static void _cookey(desprng_type *despairing, unsigned long *raw1);
 static void _scrunch(unsigned char *outof, unsigned long *into);
 static void _unscrun(unsigned long *outof, unsigned char *into);
@@ -142,7 +142,7 @@ static unsigned long bigbyte[24] =
          0x8L,      0x4L,      0x2L,      0x1L
 };
 
-void _deskey(desprng_type *despairing, unsigned char *key) /* Thanks to James Gillogly & Phil Karn! */
+static void _deskey(desprng_type *despairing, unsigned char *key) /* Thanks to James Gillogly & Phil Karn! */
 {
     int i, j, l, m, n;
     unsigned char pc1m[56], pcr[56];
@@ -207,7 +207,7 @@ static void _cookey(desprng_type *despairing, unsigned long *raw1)
     return;
 }
 
-void _usekey(desprng_type *despairing, unsigned long *from)
+static void _usekey(desprng_type *despairing, unsigned long *from)
 {
     unsigned long *to, *endp;
 
@@ -217,7 +217,7 @@ void _usekey(desprng_type *despairing, unsigned long *from)
     return;
 }
 
-void _des(desprng_type *despairing, unsigned char *inblock, unsigned char *outblock)
+static void _des(desprng_type *despairing, unsigned char *inblock, unsigned char *outblock)
 {
     unsigned long work[2];
 

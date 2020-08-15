@@ -6,19 +6,19 @@ CFLAGS =
 FILES = oldnewcomparison.c desprng.h desprng.c d3des.h d3des.c Makefile
 
 .PHONY : all
-all : oldnewcomparison
+all : oldnewcomparison libdesprng.a
 
-oldnewcomparison : oldnewcomparison.o desprng.o d3des.o
-	$(CC) -o oldnewcomparison oldnewcomparison.o desprng.o d3des.o
-
-oldnewcomparison.o : oldnewcomparison.c
-	$(CC) $(CFLAGS) -c oldnewcomparison.c
-
-print_bits.o : print_bits.c
-	$(CC) $(CFLAGS) -c print_bits.c
+libdesprng.a : desprng.o
+	ar cr libdesprng.a desprng.o
 
 desprng.o : desprng.c
 	$(CC) $(CFLAGS) -c desprng.c
+
+oldnewcomparison : oldnewcomparison.o d3des.o libdesprng.a
+	$(CC) -o oldnewcomparison oldnewcomparison.o d3des.o -L. -ldesprng
+
+oldnewcomparison.o : oldnewcomparison.c
+	$(CC) $(CFLAGS) -c oldnewcomparison.c
 
 d3des.o : d3des.h d3des.c
 	$(CC) $(CFLAGS) -c d3des.c
@@ -28,6 +28,9 @@ CrushDesPrng1 : CrushDesPrng1.o desprng.o make_unique_des_key.o d3des.o
 
 CrushDesPrng1.o : CrushDesPrng1.c
 	$(CC) $(CFLAGS) -I$(HOME)/local/TestU01-1.2.3/include -c CrushDesPrng1.c
+
+print_bits.o : print_bits.c
+	$(CC) $(CFLAGS) -c print_bits.c
 
 desprng.tgz : $(FILES)
 	tar cfvz desprng.tgz $(FILES)
