@@ -9,7 +9,8 @@ int main(int argc, char *argv[])
 {
     unsigned long nident, Ntime = 4, itime, icount, iprn;
     unsigned short Ncoll = 4, icoll;
-
+    desprng_type despairing;
+    //struct desprng_struct despairing;
     FILE *d3desdump, *desprngdump;
 
     assert(!(Ntime >> 48)); /* Make sure Ntime < 2**48 */
@@ -21,8 +22,12 @@ int main(int argc, char *argv[])
     /* On big-endian computers, the next line would be needed */
     /* nident >>= 8; */
     assert(!create_identifier(&nident));
+
     /* deskey() does not change nident, but stores it as expanded internal (and global!) state */
     deskey((unsigned char *)&nident, 0);
+
+    /* Initialize one of the new DES PRNG */
+    initialize_prng(&despairing, nident);
 
     if (!(d3desdump = fopen("d3des.out", "w"))) return -1;
 
@@ -37,6 +42,7 @@ int main(int argc, char *argv[])
             fprintf(d3desdump, " %lX", iprn);
         }
     }
+    fprintf(d3desdump, "\n");
     fclose(d3desdump);
 
     return 0;
