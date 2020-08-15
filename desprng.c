@@ -38,7 +38,7 @@ int create_identifier(unsigned long *nident)
 }
 
 
-/* Foo.
+/* Initializes the DES PRNG data structure
 
    Copyright (C) 2020 by Johan Carlsson and RadiaSoft LLC
 */
@@ -57,7 +57,7 @@ int initialize_prng(desprng_type *despairing, unsigned long nident)
 }
 
 
-/* Foo.
+/* Computes an unsigned long PRN
 
    Copyright (C) 2020 by Johan Carlsson and RadiaSoft LLC
 */
@@ -69,6 +69,18 @@ int make_prn(desprng_type *despairing, unsigned long icount, unsigned long *iprn
     return 0;
 }
 
+
+/* Returns a PRN in the form of double-precision float, uniform in the range [0, 1)
+
+   Copyright (C) 2020 by Johan Carlsson and RadiaSoft LLC
+*/
+
+double get_uniform_prn(desprng_type *despairing, unsigned long icount, unsigned long *iprn)
+{
+    _des(despairing, (unsigned char *)&icount, (unsigned char *)iprn);
+
+    return *iprn / (1.0 + ULONG_MAX);
+}
 
 /* Hopefully self explanatory... */
 
@@ -85,8 +97,9 @@ int check_type_sizes()
 }
 
 /* The functions below are modified versions of those in d3des.c
- * The most significant change is getting rid of all global variables
- * to make the code thread safe. K&R was changed to ANSI C89, etc.
+ * The most significant change was getting rid of all global variables
+ * that were written to (to make the code thread safe). K&R was changed to
+ * ANSI C89, etc.
  *
  * Johan Carlsson, August 14, 2020
  */
@@ -156,8 +169,7 @@ static void _deskey(desprng_type *despairing, unsigned char *key) /* Thanks to J
     }
     for (i = 0; i < 16; i++)
     {
-        /* if (edf == DE1) m = (15 - i) << 1; */ /* Decryption, not relevant for PRNG */
-        /* else */ m = i << 1;
+        m = i << 1;
         n = m + 1;
         kn[m] = kn[n] = 0L;
         for (j = 0; j < 28; j++)
