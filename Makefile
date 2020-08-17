@@ -3,16 +3,22 @@ CFLAGS = -O2 -ffast-math -finline-functions -funroll-loops -fomit-frame-pointer
 CFLAGS = -g
 CFLAGS =
 
-FILES = oldnewcomparison.c desprng.h desprng.c d3des.h d3des.c Makefile
+FILES = desprng.h desprng.c toypicmcc.c oldnewcomparison.c d3des.h d3des.c Makefile
 
 .PHONY : all
-all : oldnewcomparison libdesprng.a
+all : libdesprng.a toypicmcc oldnewcomparison
 
 libdesprng.a : desprng.o
 	ar cr libdesprng.a desprng.o
 
 desprng.o : desprng.c
 	$(CC) $(CFLAGS) -c desprng.c
+
+toypicmcc : toypicmcc.o libdesprng.a
+	$(CC) -o toypicmcc toypicmcc.o -L. -ldesprng
+
+toypicmcc.o : toypicmcc.c
+	$(CC) $(CFLAGS) -c toypicmcc.c
 
 oldnewcomparison : oldnewcomparison.o d3des.o libdesprng.a
 	$(CC) -o oldnewcomparison oldnewcomparison.o d3des.o -L. -ldesprng
@@ -44,4 +50,4 @@ linecount :
 
 .PHONY : clean
 clean :
-	rm -f oldnewcomparison *.o d3des.out *~ *.core
+	rm -f libdesprng.a *.o toypicmcc oldnewcomparison d3des.out desprng.out *~ *.core
