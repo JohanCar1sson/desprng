@@ -3,10 +3,10 @@ CFLAGS = -O2 -ffast-math -finline-functions -funroll-loops -fomit-frame-pointer
 CFLAGS = -g
 CFLAGS =
 
-FILES = desprng.h desprng.c toypicmcc.c oldnewcomparison.c d3des.h d3des.c Makefile
+FILES = desprng.h desprng.c toypicmcc.c crush1.c oldnewcomparison.c d3des.h d3des.c Makefile
 
 .PHONY : all
-all : libdesprng.a toypicmcc oldnewcomparison
+all : libdesprng.a toypicmcc crush1 oldnewcomparison
 
 libdesprng.a : desprng.o
 	ar cr libdesprng.a desprng.o
@@ -20,6 +20,12 @@ toypicmcc : toypicmcc.o libdesprng.a
 toypicmcc.o : toypicmcc.c
 	$(CC) $(CFLAGS) -c toypicmcc.c
 
+crush1 : crush1.o libdesprng.a
+	$(CC) -o crush1 crush1.o -L. -ldesprng -L$(HOME)/local/TestU01-1.2.3/lib64 -ltestu01 -lprobdist -lmylib -lgmp -lm -Wl,-rpath,$(HOME)/local/TestU01-1.2.3/lib64
+
+crush1.o : crush1.c
+	$(CC) $(CFLAGS) -I$(HOME)/local/TestU01-1.2.3/include -c crush1.c
+
 oldnewcomparison : oldnewcomparison.o d3des.o libdesprng.a
 	$(CC) -o oldnewcomparison oldnewcomparison.o d3des.o -L. -ldesprng
 
@@ -28,15 +34,6 @@ oldnewcomparison.o : oldnewcomparison.c
 
 d3des.o : d3des.h d3des.c
 	$(CC) $(CFLAGS) -c d3des.c
-
-CrushDesPrng1 : CrushDesPrng1.o desprng.o make_unique_des_key.o d3des.o
-	$(CC) -o CrushDesPrng1 CrushDesPrng1.o desprng.o make_unique_des_key.o d3des.o -L$(HOME)/local/TestU01-1.2.3/lib64 -ltestu01 -lprobdist -lmylib -lgmp -lm -Wl,-rpath,$(HOME)/local/TestU01-1.2.3/lib64
-
-CrushDesPrng1.o : CrushDesPrng1.c
-	$(CC) $(CFLAGS) -I$(HOME)/local/TestU01-1.2.3/include -c CrushDesPrng1.c
-
-print_bits.o : print_bits.c
-	$(CC) $(CFLAGS) -c print_bits.c
 
 desprng.tgz : $(FILES)
 	tar cfvz desprng.tgz $(FILES)
@@ -50,4 +47,4 @@ linecount :
 
 .PHONY : clean
 clean :
-	rm -f libdesprng.a *.o toypicmcc oldnewcomparison d3des.out desprng.out *~ *.core
+	rm -f libdesprng.a *.o toypicmcc crush1 oldnewcomparison d3des.out desprng.out *~ *.core
