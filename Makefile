@@ -3,10 +3,10 @@ CFLAGS = -O2 -ffast-math -finline-functions -funroll-loops -fomit-frame-pointer
 CFLAGS = -g
 CFLAGS =
 
-FILES = desprng.h desprng.c toypicmcc.c crush1.c crush2.c oldnewcomparison.c d3des.h d3des.c Makefile
+FILES = desprng.h desprng.c toypicmcc.c crush0.c crush1.c crush2.c oldnewcomparison.c d3des.h d3des.c Makefile
 
 .PHONY : all
-all : libdesprng.a toypicmcc crush1 crush2 oldnewcomparison
+all : libdesprng.a toypicmcc crush0 crush1 crush2 oldnewcomparison
 
 libdesprng.a : desprng.o
 	ar cr libdesprng.a desprng.o
@@ -19,6 +19,12 @@ toypicmcc : toypicmcc.o libdesprng.a
 
 toypicmcc.o : toypicmcc.c
 	$(CC) $(CFLAGS) -c toypicmcc.c
+
+crush0 : crush0.o
+	$(CC) -o crush0 crush0.o -L$(HOME)/local/TestU01-1.2.3/lib64 -ltestu01 -lprobdist -lmylib -lgmp -lm -Wl,-rpath,$(HOME)/local/TestU01-1.2.3/lib64
+
+crush0.o : crush0.c
+	$(CC) $(CFLAGS) -I$(HOME)/local/TestU01-1.2.3/include -c crush0.c
 
 crush1 : crush1.o libdesprng.a
 	$(CC) -o crush1 crush1.o -L. -ldesprng -L$(HOME)/local/TestU01-1.2.3/lib64 -ltestu01 -lprobdist -lmylib -lgmp -lm -Wl,-rpath,$(HOME)/local/TestU01-1.2.3/lib64
@@ -53,4 +59,4 @@ linecount :
 
 .PHONY : clean
 clean :
-	rm -f libdesprng.a *.o toypicmcc crush1 crush2 oldnewcomparison d3des.out desprng.out *~ *.core
+	rm -f libdesprng.a *.o toypicmcc crush0 crush1 crush2 oldnewcomparison d3des.out desprng.out *~ *.core

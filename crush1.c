@@ -28,6 +28,8 @@ int main()
 
     gen = unif01_CreateExternGenBits("DES PRNG", desprng);
     bbattery_SmallCrush(gen);
+    /* bbattery_Crush(gen); */
+    /* bbattery_BigCrush(gen); */
     unif01_DeleteExternGenBits(gen);
 
     return 0;
