@@ -26,11 +26,12 @@ int main(int argc, char *argv[])
         return ierr;
     }
     /* Make some workspace on the stack for the DES PRNGs */
-#ifndef _OPENACC
+/* #ifndef _OPENACC */
     nident = alloca(8 * Npart);
     thread_data = alloca(sizeof(desprng_individual_t) * Npart);
     process_data = alloca(sizeof(desprng_common_t));
-#endif
+/* #endif */
+    /* It looks like it's necessary to allocate memory on the host for create() to work on the device? */
     #pragma acc enter data create(nident[:Npart], thread_data[:Npart], process_data[:1])
     initialize_common(process_data);
 
