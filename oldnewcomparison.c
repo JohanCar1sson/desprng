@@ -9,8 +9,8 @@ int main(int argc, char *argv[])
 {
     unsigned long nident, Ntime = 4, itime, icount, iprn;
     unsigned short Ncoll = 4, icoll;
-    desprng_type despairing;
-    //struct desprng_struct despairing;
+    desprng_common_t process_data;
+    desprng_individual_t thread_data;
     FILE *d3desdump, *desprngdump;
 
     assert(!(Ntime >> 48)); /* Make sure Ntime < 2**48 */
@@ -27,7 +27,8 @@ int main(int argc, char *argv[])
     deskey((unsigned char *)&nident, 0);
 
     /* Initialize one of the new DES PRNG */
-    initialize_prng(&despairing, nident);
+    initialize_common(&process_data);
+    initialize_individual(&process_data, &thread_data, nident);
 
     if (!(d3desdump = fopen("d3des.out", "w"))) return -1;
     if (!(desprngdump = fopen("desprng.out", "w"))) return -1;
@@ -45,7 +46,7 @@ int main(int argc, char *argv[])
             icount = (itime << 16) + icoll;
             des((unsigned char *)&icount, (unsigned char *)&iprn);
             fprintf(d3desdump, " %016lX", iprn);
-            make_prn(&despairing, icount, &iprn);
+            make_prn(&process_data, &thread_data, icount, &iprn);
             fprintf(desprngdump, " %016lX", iprn);
         }
     }
