@@ -23,7 +23,8 @@
  */
 
 unsigned desprngs();
-desprng_type despairing[2];
+desprng_common_t process_data;
+desprng_individual_t thread_data[2];
 unsigned long icount = 0UL, iprn64;
 
 int main()
@@ -39,12 +40,13 @@ int main()
     /* Initialize the identifier nident and a pair of DES PRNGs */
     assert(!create_identifier(nident));
     assert(!create_identifier(nident + 1));
-    initialize_prng(despairing, nident[0]);
-    initialize_prng(despairing + 1, nident[1]);
+    initialize_common(&process_data);
+    initialize_individual(&process_data, thread_data, nident[0]);
+    initialize_individual(&process_data, thread_data + 1, nident[1]);
 
     gen = unif01_CreateExternGenBits("Pair of DES PRNGs", desprngs);
-    /* bbattery_SmallCrush(gen); */
-    bbattery_Crush(gen);
+    bbattery_SmallCrush(gen);
+    /* bbattery_Crush(gen); */
     unif01_DeleteExternGenBits(gen);
 
     return 0;
@@ -58,7 +60,7 @@ unsigned desprngs()
     if (icount++ % 2 == 0) /* For even icount, create new 8-byte pseudo-random number... */
     {
         /* Alternate between despairing[0] and despairing[1] */
-        make_prn(despairing + (icount % 4 == 3), icount / 4, &iprn64);
+        make_prn(&process_data, thread_data + (icount % 4 == 3), icount / 4, &iprn64);
         return iprn32[0]; /* and return one half of it */
     }
     else /* For odd icount... */

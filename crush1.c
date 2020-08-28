@@ -9,7 +9,8 @@
    It should pass all the tests! */
 
 unsigned desprng();
-desprng_type despairing;
+desprng_common_t process_data;
+desprng_individual_t thread_data;
 unsigned long icount = 0UL, iprn64;
 
 int main()
@@ -24,7 +25,8 @@ int main()
 
     /* Initialize the identifier nident and a DES PRNG */
     assert(!create_identifier(&nident));
-    initialize_prng(&despairing, nident);
+    initialize_common(&process_data);
+    initialize_individual(&process_data, &thread_data, nident);
 
     gen = unif01_CreateExternGenBits("DES PRNG", desprng);
     bbattery_SmallCrush(gen);
@@ -42,7 +44,7 @@ unsigned desprng()
 
     if (icount++ % 2 == 0) /* For even icount, create new 8-byte pseudo-random number... */
     {
-        make_prn(&despairing, icount / 2, &iprn64);
+        make_prn(&process_data, &thread_data, icount / 2, &iprn64);
         return iprn32[0]; /* and return one half of it */
     }
     else /* For odd icount... */
