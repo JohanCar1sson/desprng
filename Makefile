@@ -1,7 +1,8 @@
 CC = gcc
 CFLAGS = -O2 -ffast-math -finline-functions -funroll-loops -fomit-frame-pointer
 CFLAGS = -g
-CFLAGS =
+#CC = pgcc
+#CFLAGS = -acc -Minfo
 
 FILES = desprng.h desprng.c toypicmcc.c crush0.c crush1.c crush2.c oldnewcomparison.c d3des.h d3des.c Makefile
 

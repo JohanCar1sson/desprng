@@ -5,7 +5,7 @@
  * Compared to the Mersenne Twister (MT), it only has 7 bytes of state
  * (vs. ~2,500 bytes), uses 80% more computation, and passes all 144 tests of
  * the Crush suite (vs. 142 tests passed by MT). The DES PRNG allows up to
- *  2**56 threads to produce uncorrelated PRN sequences with a period of 2**64.
+ * 2**56 threads to produce uncorrelated PRN sequences with a period of 2**64.
  *
  * See the source file for copyright on the individual functions.
  *
@@ -13,7 +13,7 @@
 */
 
 /* Data structure that each thread needs a private copy of */
-typedef struct desprng_struct
+typedef struct desprng_thread_variables
 {
     /* This is the unique PRNG identifier */
     unsigned long nident;
@@ -23,11 +23,35 @@ typedef struct desprng_struct
     unsigned long KnR[32];
     unsigned long Kn3[32];
 }
-desprng_type;
+desprng_individual_t;
+
+/* Read-only data structure accessed by all threads */
+typedef struct desprng_process_variables
+{
+    unsigned char pc1[56];
+    unsigned char pc2[48];
+    unsigned char totrot[16];
+    unsigned short bytebit[8];
+    unsigned long bigbyte[24];
+    unsigned long SP[8][64];
+}
+desprng_common_t;
 
 /* Signatures for the user interface */
+
+#pragma acc routine(initialize_common) seq
+int initialize_common(desprng_common_t *process_data);
+
+#pragma acc routine(create_identifier) seq
 int create_identifier(unsigned long *nident);
-int initialize_prng(desprng_type *despairing, unsigned long nident);
-int make_prn(desprng_type *despairing, unsigned long icount, unsigned long *iprn);
-double get_uniform_prn(desprng_type *despairing, unsigned long icount, unsigned long *iprn);
+
+#pragma acc routine(initialize_individual) seq
+int initialize_individual(desprng_common_t *process_data, desprng_individual_t *thread_data, unsigned long nident);
+
+#pragma acc routine(make_prn) seq
+int make_prn(desprng_common_t *process_data, desprng_individual_t *thread_data, unsigned long icount, unsigned long *iprn);
+
+#pragma acc routine(get_uniform_prn) seq
+double get_uniform_prn(desprng_common_t *process_data, desprng_individual_t *thread_data, unsigned long icount, unsigned long *iprn);
+
 int check_type_sizes();
