@@ -283,14 +283,14 @@ int initialize_common(desprng_common_t *process_data)
     for (i = 0; i < 24; i++) process_data->bigbyte[i] = bigbyte[i];
     for (i = 0; i < 64; i++)
     {
-        process_data->SP[0][i] = SP1[i];
-        process_data->SP[1][i] = SP2[i];
-        process_data->SP[2][i] = SP3[i];
-        process_data->SP[3][i] = SP4[i];
-        process_data->SP[4][i] = SP5[i];
-        process_data->SP[5][i] = SP6[i];
-        process_data->SP[6][i] = SP7[i];
-        process_data->SP[7][i] = SP8[i];
+        process_data->SP[0 * 64 + i] = SP1[i];
+        process_data->SP[1 * 64 + i] = SP2[i];
+        process_data->SP[2 * 64 + i] = SP3[i];
+        process_data->SP[3 * 64 + i] = SP4[i];
+        process_data->SP[4 * 64 + i] = SP5[i];
+        process_data->SP[5 * 64 + i] = SP6[i];
+        process_data->SP[6 * 64 + i] = SP7[i];
+        process_data->SP[7 * 64 + i] = SP8[i];
     }
     return 0;
 }
@@ -485,27 +485,27 @@ static void _desfunc(desprng_common_t *process_data, unsigned long *block, unsig
     {
         work  = (right << 28) | (right >> 4);
         work ^= *keys++;
-        fval  = process_data->SP[6][ work        & 0x3fL];
-        fval |= process_data->SP[4][(work >>  8) & 0x3fL];
-        fval |= process_data->SP[2][(work >> 16) & 0x3fL];
-        fval |= process_data->SP[0][(work >> 24) & 0x3fL];
+        fval  = process_data->SP[6 * 64 +  work        & 0x3fL];
+        fval |= process_data->SP[4 * 64 + (work >>  8) & 0x3fL];
+        fval |= process_data->SP[2 * 64 + (work >> 16) & 0x3fL];
+        fval |= process_data->SP[0 * 64 + (work >> 24) & 0x3fL];
         work  = right ^ *keys++;
-        fval |= process_data->SP[7][ work        & 0x3fL];
-        fval |= process_data->SP[5][(work >>  8) & 0x3fL];
-        fval |= process_data->SP[3][(work >> 16) & 0x3fL];
-        fval |= process_data->SP[1][(work >> 24) & 0x3fL];
+        fval |= process_data->SP[7 * 64 +  work        & 0x3fL];
+        fval |= process_data->SP[5 * 64 + (work >>  8) & 0x3fL];
+        fval |= process_data->SP[3 * 64 + (work >> 16) & 0x3fL];
+        fval |= process_data->SP[1 * 64 + (work >> 24) & 0x3fL];
         leftt ^= fval;
         work  = (leftt << 28) | (leftt >> 4);
         work ^= *keys++;
-        fval  = process_data->SP[6][ work        & 0x3fL];
-        fval |= process_data->SP[4][(work >>  8) & 0x3fL];
-        fval |= process_data->SP[2][(work >> 16) & 0x3fL];
-        fval |= process_data->SP[0][(work >> 24) & 0x3fL];
+        fval  = process_data->SP[6 * 64 +  work        & 0x3fL];
+        fval |= process_data->SP[4 * 64 + (work >>  8) & 0x3fL];
+        fval |= process_data->SP[2 * 64 + (work >> 16) & 0x3fL];
+        fval |= process_data->SP[0 * 64 + (work >> 24) & 0x3fL];
         work  = leftt ^ *keys++;
-        fval |= process_data->SP[7][ work        & 0x3fL];
-        fval |= process_data->SP[5][(work >>  8) & 0x3fL];
-        fval |= process_data->SP[3][(work >> 16) & 0x3fL];
-        fval |= process_data->SP[1][(work >> 24) & 0x3fL];
+        fval |= process_data->SP[7 * 64 +  work        & 0x3fL];
+        fval |= process_data->SP[5 * 64 + (work >>  8) & 0x3fL];
+        fval |= process_data->SP[3 * 64 + (work >> 16) & 0x3fL];
+        fval |= process_data->SP[1 * 64 + (work >> 24) & 0x3fL];
         right ^= fval;
     }
     right = (right << 31) | (right >> 1);

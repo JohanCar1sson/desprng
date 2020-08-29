@@ -28,12 +28,12 @@ desprng_individual_t;
 /* Read-only data structure accessed by all threads */
 typedef struct desprng_process_variables
 {
+    unsigned long SP[512];
+    unsigned long bigbyte[24];
     unsigned char pc1[56];
     unsigned char pc2[48];
     unsigned char totrot[16];
     unsigned short bytebit[8];
-    unsigned long bigbyte[24];
-    unsigned long SP[8][64];
 }
 desprng_common_t;
 

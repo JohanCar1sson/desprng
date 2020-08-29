@@ -26,12 +26,14 @@ int main(int argc, char *argv[])
         return ierr;
     }
     /* Make some workspace on the stack for the DES PRNGs */
-#ifndef _OPENACC
+/* #ifndef _OPENACC */
     nident = alloca(8 * Npart);
     thread_data = alloca(sizeof(desprng_individual_t) * Npart);
     process_data = alloca(sizeof(desprng_common_t));
-#endif
-    #pragma acc enter data create(nident[:Npart], thread_data[:Npart], process_data[:1])
+/* #endif */
+    #pragma acc enter data create(nident[:Npart], thread_data[:Npart])
+    #pragma acc enter data create(process_data[:1])
+    /* #pragma acc enter data create(process_data[0].SP[:512], process_data[0].bigbyte[:24], process_data[0].pc1[:56], process_data[0].pc2[:48], process_data[0].totrot[:16], process_data[0].bytebit[:8]) */
     initialize_common(process_data);
 
     for (itime = 0UL; itime < Ntime; itime++)
@@ -64,7 +66,9 @@ int main(int argc, char *argv[])
         }
         #pragma acc wait
     }
-    #pragma acc exit data delete(nident[:Npart], thread_data[:Npart], process_data[:1])
+    #pragma acc exit data delete(nident[:Npart], thread_data[:Npart])
+    /* #pragma acc exit data delete(process_data[0].SP[:512], process_data[0].bigbyte[:24], process_data[0].pc1[:56], process_data[0].pc2[:48], process_data[0].totrot[:16], process_data[0].bytebit[:8]) */
+    #pragma acc exit data delete(process_data[:1])
 
     return 0;
 }
