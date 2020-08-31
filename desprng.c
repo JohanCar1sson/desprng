@@ -351,6 +351,11 @@ static void _deskey(desprng_common_t *process_data, desprng_individual_t *thread
     unsigned long kn[32];
 
     printf("key[0] = %hu\n", (unsigned short)key[0]);
+    printf("pc1[55] = %hu, pc2[47] = %hu, totrot[15] = %hu\n", (unsigned short)(process_data->pc1[55]), (unsigned short)(process_data->pc2[47]), (unsigned short)(process_data->totrot[15]));
+    /* pgcc -acc won't compile the next line without the needless explicit cast */
+    /* printf("bytebit[7] = %hu, ", (unsigned short)(process_data->bytebit[7])); */
+    /* pgcc -acc says about the next line: "parse stored value and pointer type do not match" */
+    /* printf("bigbyte[23] = %lu\n", process_data->bigbyte[23]); */
     for (j = 0; j < 56; j++)
     {
         l = process_data->pc1[j];

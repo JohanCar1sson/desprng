@@ -30,8 +30,9 @@ int main(int argc, char *argv[])
     process_data = alloca(sizeof(desprng_common_t));
 /* #endif */
     /* It looks like it's necessary to allocate memory on the host for create() to work on the device? */
-    #pragma acc declare copy(xaverage, xvariance)
+    /* #pragma acc data copy(xaverage, xvariance)
     #pragma acc enter data create(nident[:Npart], thread_data[:Npart], process_data[:1])
+    #pragma acc enter data create(process_data[0].pc1[:56], process_data[0].pc2[:48], process_data[0].totrot[:16], process_data[0].bytebit[:8], process_data[0].bigbyte[:24]) */
     initialize_common(process_data);
 
     for (itime = 0UL; itime < Ntime; itime++)
@@ -52,7 +53,8 @@ int main(int argc, char *argv[])
             for (icoll = 0; icoll < Ncoll; icoll++)
             {
                 /* Make itime the high six bytes of icount, and icoll the low two bytes */
-                icount = (itime << 16) + icoll;
+                icount = (itime << 16) + icoll; /* Evaluates to icoll on device */
+                icount = 65536UL * itime + (unsigned long)icoll; /* As does this one! */
                 /* Create the unsigned long pseudo-random number iprn */
                 make_prn(process_data, thread_data + ipart, icount, &iprn);
                 /* Now get PRN in the form of double-precision float xprn, normalized to [0, 1) */
@@ -61,13 +63,14 @@ int main(int argc, char *argv[])
                 xvariance += (xprn - 0.5) * (xprn - 0.5);
                 /* In a real PIC-MCC code, we'd use the PRNs in a collision model, here we'll just print them */
 /* #ifndef _OPENACC */
-                printf("itime = %lu, ipart = %lu, icoll = %hu, iprn = 0x%016lX, xprn = %18.16lf\n", itime, ipart, icoll, iprn, xprn);
+                printf("itime = %lu, ipart = %lu, icoll = %hu, icount = %lu, iprn = 0x%016lX, xprn = %18.16lf\n", itime, ipart, icoll, icount, iprn, xprn);
 /* #endif */
             }
         }
         #pragma acc wait
     }
-    #pragma acc exit data delete(nident[:Npart], thread_data[:Npart], process_data[:1])
+    /* #pragma acc exit data delete(process_data[0].pc1[:56], process_data[0].pc2[:48], process_data[0].totrot[:16], process_data[0].bytebit[:8], process_data[0].bigbyte[:24])
+    #pragma acc exit data delete(nident[:Npart], thread_data[:Npart], process_data[:1]) */
 
     xaverage /= Ntime * Npart * Ncoll;
     xvariance /= Ntime * Npart * Ncoll;

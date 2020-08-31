@@ -3,9 +3,11 @@ CFLAGS = -O2 -ffast-math -finline-functions -funroll-loops -fomit-frame-pointer
 CFLAGS = -g
 LDFLAGS =
 
-#CC = pgcc
-#CFLAGS = -acc -Minfo
-#LDFLAGS = -acc
+CC = pgcc
+CFLAGS = -acc -Minfo
+LDFLAGS = -acc
+CFLAGS = -ta=tesla:managed -Minfo
+LDFLAGS = -ta=tesla:managed
 
 FILES = desprng.h desprng.c toypicmcc.c crush0.c crush1.c crush2.c oldnewcomparison.c d3des.h d3des.c Makefile
 
