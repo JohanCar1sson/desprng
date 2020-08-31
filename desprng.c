@@ -1,5 +1,6 @@
 #include <limits.h>
 #include "desprng.h"
+#include <stdio.h>
 
 /* These are the signatures for the modified d3des functions that we call directly */
 #pragma acc routine(_deskey) seq
@@ -349,6 +350,7 @@ static void _deskey(desprng_common_t *process_data, desprng_individual_t *thread
     unsigned char pc1m[56], pcr[56];
     unsigned long kn[32];
 
+    printf("key[0] = %hu\n", (unsigned short)key[0]);
     for (j = 0; j < 56; j++)
     {
         l = process_data->pc1[j];
@@ -378,6 +380,7 @@ static void _deskey(desprng_common_t *process_data, desprng_individual_t *thread
             if (pcr[process_data->pc2[j + 24]]) kn[n] |= process_data->bigbyte[j];
         }
     }
+    printf("kn[3] = %lu, kn[31] = %lu\n", kn[3], kn[31]);
     _cookey(thread_data, kn);
 
     return;

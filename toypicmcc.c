@@ -1,5 +1,3 @@
-/* pgcc -o toypicmcc -acc -Minfo toypicmcc.c && ./toypicmcc */
-
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -12,7 +10,7 @@ int main(int argc, char *argv[])
     unsigned short Ncoll = 2, icoll;
     desprng_common_t *process_data;
     desprng_individual_t *thread_data;
-    double xprn;
+    double xprn, xaverage = 0.0, xvariance = 0.0;
     int ierr;
 
     assert(!(Npart >> 56)); /* Make sure Npart < 2**56 */
@@ -32,13 +30,14 @@ int main(int argc, char *argv[])
     process_data = alloca(sizeof(desprng_common_t));
 /* #endif */
     /* It looks like it's necessary to allocate memory on the host for create() to work on the device? */
+    #pragma acc declare copy(xaverage, xvariance)
     #pragma acc enter data create(nident[:Npart], thread_data[:Npart], process_data[:1])
     initialize_common(process_data);
 
     for (itime = 0UL; itime < Ntime; itime++)
     {
         #pragma acc parallel
-        #pragma acc loop
+        #pragma acc loop reduction(+: xaverage, xvariance)
         for (ipart = 0UL; ipart < Npart; ipart++)
         {
             if (!itime)
@@ -46,6 +45,7 @@ int main(int argc, char *argv[])
                 /* Create unique DES PRNG identifier using particle number */
                 nident[ipart] = ipart;
                 create_identifier(nident + ipart);
+                printf("nident[%lu] = 0x%016lX\n", ipart, nident[ipart]);
                 /* Initialize one DES PRNG for each particle */
                 initialize_individual(process_data, thread_data + ipart, nident[ipart]);
             }
@@ -57,15 +57,21 @@ int main(int argc, char *argv[])
                 make_prn(process_data, thread_data + ipart, icount, &iprn);
                 /* Now get PRN in the form of double-precision float xprn, normalized to [0, 1) */
                 xprn = get_uniform_prn(process_data, thread_data + ipart, icount, &iprn);
+                xaverage += xprn;
+                xvariance += (xprn - 0.5) * (xprn - 0.5);
                 /* In a real PIC-MCC code, we'd use the PRNs in a collision model, here we'll just print them */
-#ifndef _OPENACC
+/* #ifndef _OPENACC */
                 printf("itime = %lu, ipart = %lu, icoll = %hu, iprn = 0x%016lX, xprn = %18.16lf\n", itime, ipart, icoll, iprn, xprn);
-#endif
+/* #endif */
             }
         }
         #pragma acc wait
     }
     #pragma acc exit data delete(nident[:Npart], thread_data[:Npart], process_data[:1])
+
+    xaverage /= Ntime * Npart * Ncoll;
+    xvariance /= Ntime * Npart * Ncoll;
+    printf("average = %18.16lf / 2, variance = %18.16lf / 12\n", 2.0 * xaverage, 12.0 * xvariance);
 
     return 0;
 }
