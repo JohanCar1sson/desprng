@@ -5,8 +5,8 @@
 
 #include "desprng.h"
 
-/* Subject a single DES PRNG to the TestU01 Small Crush test.
-   It should pass all the tests! */
+/* Subject a single DES PRNG to the TestU01 Crush test suite, DIEHARD
+   and FIPS_140_2. It should pass all the tests! */
 
 unsigned desprng();
 desprng_common_t process_data;
@@ -32,6 +32,8 @@ int main()
     bbattery_SmallCrush(gen);
     /* bbattery_Crush(gen); */
     /* bbattery_BigCrush(gen); */
+    bbattery_pseudoDIEHARD(gen);
+    bbattery_FIPS_140_2(gen);
     unif01_DeleteExternGenBits(gen);
 
     return 0;

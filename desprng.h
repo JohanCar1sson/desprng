@@ -4,8 +4,9 @@
  * It is based on the Data Encryption Standard (DES) block cipher.
  * Compared to the Mersenne Twister (MT), it only has 7 bytes of state
  * (vs. ~2,500 bytes), uses 80% more computation, and passes all 144 tests of
- * the Crush suite (vs. 142 tests passed by MT). The DES PRNG allows up to
- * 2**56 threads to produce uncorrelated PRN sequences with a period of 2**64.
+ * the Crush suite (vs. 142 tests passed by MT), as well as all 126 tests of
+ * the DIEHARD suite and the 4 tests of FIPS-140-2. The DES PRNG allows up to
+ * 2**56 threads to produceuncorrelated PRN sequences with a period of 2**64.
  *
  * See the source file for copyright on the individual functions.
  *

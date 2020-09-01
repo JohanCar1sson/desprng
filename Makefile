@@ -9,10 +9,10 @@ LDFLAGS = -acc
 CFLAGS = -ta=tesla:managed -Minfo
 LDFLAGS = -ta=tesla:managed
 
-FILES = desprng.h desprng.c toypicmcc.c crush0.c crush1.c crush2.c oldnewcomparison.c d3des.h d3des.c Makefile
+FILES = desprng.h desprng.c toypicmcc.c oldnewcomparison.c d3des.h d3des.c Makefile crush0.c crush1.c crush2.c Makefile.crush
 
 .PHONY : all
-all : libdesprng.a toypicmcc crush0 crush1 crush2 oldnewcomparison
+all : libdesprng.a toypicmcc
 
 libdesprng.a : desprng.o
 	ar cr libdesprng.a desprng.o
@@ -25,24 +25,6 @@ toypicmcc : toypicmcc.o libdesprng.a
 
 toypicmcc.o : toypicmcc.c
 	$(CC) $(CFLAGS) -c toypicmcc.c
-
-crush0 : crush0.o
-	$(CC) -o crush0 crush0.o -L$(HOME)/local/TestU01-1.2.3/lib64 -ltestu01 -lprobdist -lmylib -lgmp -lm -Wl,-rpath,$(HOME)/local/TestU01-1.2.3/lib64
-
-crush0.o : crush0.c
-	$(CC) $(CFLAGS) -I$(HOME)/local/TestU01-1.2.3/include -c crush0.c
-
-crush1 : crush1.o libdesprng.a
-	$(CC) -o crush1 crush1.o -L. -ldesprng -L$(HOME)/local/TestU01-1.2.3/lib64 -ltestu01 -lprobdist -lmylib -lgmp -lm -Wl,-rpath,$(HOME)/local/TestU01-1.2.3/lib64
-
-crush1.o : crush1.c
-	$(CC) $(CFLAGS) -I$(HOME)/local/TestU01-1.2.3/include -c crush1.c
-
-crush2 : crush2.o libdesprng.a
-	$(CC) -o crush2 crush2.o -L. -ldesprng -L$(HOME)/local/TestU01-1.2.3/lib64 -ltestu01 -lprobdist -lmylib -lgmp -lm -Wl,-rpath,$(HOME)/local/TestU01-1.2.3/lib64
-
-crush2.o : crush2.c
-	$(CC) $(CFLAGS) -I$(HOME)/local/TestU01-1.2.3/include -c crush2.c
 
 oldnewcomparison : oldnewcomparison.o d3des.o libdesprng.a
 	$(CC) -o oldnewcomparison oldnewcomparison.o d3des.o -L. -ldesprng
@@ -65,4 +47,4 @@ linecount :
 
 .PHONY : clean
 clean :
-	rm -f libdesprng.a *.o toypicmcc crush0 crush1 crush2 oldnewcomparison d3des.out desprng.out *~ *.core
+	rm -f libdesprng.a *.o toypicmcc oldnewcomparison d3des.out desprng.out *~ *.core
