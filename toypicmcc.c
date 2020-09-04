@@ -38,7 +38,6 @@ int main(int argc, char *argv[])
     for (itime = 0UL; itime < Ntime; itime++)
     {
         #pragma acc parallel
-        #pragma acc loop reduction(+: xaverage, xvariance)
         for (ipart = 0UL; ipart < Npart; ipart++)
         {
             if (!itime)
@@ -50,11 +49,15 @@ int main(int argc, char *argv[])
                 /* Initialize one DES PRNG for each particle */
                 initialize_individual(process_data, thread_data + ipart, nident[ipart]);
             }
+            #pragma acc loop reduction(+: xaverage, xvariance)
             for (icoll = 0; icoll < Ncoll; icoll++)
             {
                 /* Make itime the high six bytes of icount, and icoll the low two bytes */
-                icount = (itime << 16) + icoll; /* Evaluates to icoll on device */
-                icount = 65536UL * itime + (unsigned long)icoll; /* As does this one! */
+#ifdef _OPENACC
+                icount = itime << 16; icount += icoll; /* Workaround for pgcc compiler bug */
+#else
+                icount = (itime << 16) + icoll;
+#endif
                 /* Create the unsigned long pseudo-random number iprn */
                 make_prn(process_data, thread_data + ipart, icount, &iprn);
                 /* Now get PRN in the form of double-precision float xprn, normalized to [0, 1) */
@@ -62,9 +65,7 @@ int main(int argc, char *argv[])
                 xaverage += xprn;
                 xvariance += (xprn - 0.5) * (xprn - 0.5);
                 /* In a real PIC-MCC code, we'd use the PRNs in a collision model, here we'll just print them */
-/* #ifndef _OPENACC */
                 printf("itime = %lu, ipart = %lu, icoll = %hu, icount = %lu, iprn = 0x%016lX, xprn = %18.16lf\n", itime, ipart, icoll, icount, iprn, xprn);
-/* #endif */
             }
         }
         #pragma acc wait
