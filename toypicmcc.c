@@ -30,7 +30,8 @@ int main(int argc, char *argv[])
     process_data = alloca(sizeof(desprng_common_t));
 /* #endif */
     /* It looks like it's necessary to allocate memory on the host for create() to work on the device? */
-    /* #pragma acc data copy(xaverage, xvariance)
+    /* #pragma acc data copyin(Ntime, Npart, Ncoll)
+    #pragma acc data copy(xaverage, xvariance)
     #pragma acc enter data create(nident[:Npart], thread_data[:Npart], process_data[:1])
     #pragma acc enter data create(process_data[0].pc1[:56], process_data[0].pc2[:48], process_data[0].totrot[:16], process_data[0].bytebit[:8], process_data[0].bigbyte[:24]) */
     initialize_common(process_data);
@@ -45,7 +46,7 @@ int main(int argc, char *argv[])
                 /* Create unique DES PRNG identifier using particle number */
                 nident[ipart] = ipart;
                 create_identifier(nident + ipart);
-                printf("nident[%lu] = 0x%016lX\n", ipart, nident[ipart]);
+                /* printf("nident[%lu] = 0x%016lX\n", ipart, nident[ipart]); */
                 /* Initialize one DES PRNG for each particle */
                 initialize_individual(process_data, thread_data + ipart, nident[ipart]);
             }
