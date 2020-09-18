@@ -3,11 +3,11 @@ CFLAGS = -O2 -ffast-math -finline-functions -funroll-loops -fomit-frame-pointer
 CFLAGS = -g
 LDFLAGS =
 
-CC = pgcc
-CFLAGS = -acc -Minfo
-LDFLAGS = -acc
+#CC = pgcc
 #CFLAGS = -ta=tesla:managed -Minfo
 #LDFLAGS = -ta=tesla:managed
+#CFLAGS = -acc -Minfo
+#LDFLAGS = -acc
 
 FILES = desprng.h desprng.c toypicmcc.c oldnewcomparison.c d3des.h d3des.c Makefile crush0.c crush1.c crush2.c Makefile.crush
 
@@ -21,7 +21,7 @@ desprng.o : desprng.c
 	$(CC) $(CFLAGS) -c desprng.c
 
 toypicmcc : toypicmcc.o libdesprng.a
-	$(CC) -o toypicmcc toypicmcc.o -L. -ldesprng $(LDFLAGS)
+	$(CC) -o toypicmcc toypicmcc.o -L. -ldesprng $(LDFLAGS) -lm
 
 toypicmcc.o : toypicmcc.c
 	$(CC) $(CFLAGS) -c toypicmcc.c
