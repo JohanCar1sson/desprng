@@ -9,7 +9,7 @@ LDFLAGS =
 #CFLAGS = -acc -Minfo
 #LDFLAGS = -acc
 
-FILES = desprng.h desprng.c toypicmcc.c oldnewcomparison.c d3des.h d3des.c Makefile crush0.c crush1.c crush2.c Makefile.crush
+FILES = desprng.h desprng.c toypicmcc.c xiplot.py oldnewcomparison.c d3des.h d3des.c Makefile crush0.c crush1.c crush2.c Makefile.crush
 
 .PHONY : all
 all : libdesprng.a toypicmcc

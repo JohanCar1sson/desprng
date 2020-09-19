@@ -12,6 +12,7 @@ int main(int argc, char *argv[])
     desprng_common_t *process_data;
     desprng_individual_t *thread_data;
     double xprn, zeta, czeta, zaverage = 0.0, zvariance = 0.0, dt = 1.0e-2, xt, *xi;
+    const double xi0 = M_SQRT1_2; /* 45 degree pitch angle */
     int ierr;
     /* struct coord { double x, xi; } *coords; */
     FILE *xidump;
@@ -60,7 +61,7 @@ int main(int argc, char *argv[])
                 /* Initialize one DES PRNG for each particle */
                 initialize_individual(process_data, thread_data + ipart, nident[ipart]);
                 /* Initialize particle pitch coordinate */
-                xi[ipart] = M_SQRT1_2; /* 45 degree pitch angle */
+                xi[ipart] = xi0;
             }
             #pragma acc loop reduction(+: xaverage, xvariance)
             for (icoll = 0; icoll < Ncoll; icoll++)
@@ -97,6 +98,7 @@ int main(int argc, char *argv[])
 
     /* Dump the particle pitches for post processing */
     fwrite(&Npart, 8, 1, xidump);
+    fwrite(&xi0, 8, 1, xidump);
     fwrite(&xt, 8, 1, xidump);
     fwrite(xi, 8, Npart, xidump);
     fclose(xidump);
