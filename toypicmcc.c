@@ -12,9 +12,8 @@ int main(int argc, char *argv[])
     desprng_common_t *process_data;
     desprng_individual_t *thread_data;
     double xprn, zeta, czeta, zaverage = 0.0, zvariance = 0.0, dt = 1.0e-2, xt, *xi;
-    const double xi0 = M_SQRT1_2; /* 45 degree pitch angle */
+    /* const */ double xi0 = M_SQRT1_2; /* 45 degree pitch angle */
     int ierr;
-    /* struct coord { double x, xi; } *coords; */
     FILE *xidump;
 
     assert(!(Npart >> 56)); /* Make sure Npart < 2**56 */
@@ -38,13 +37,16 @@ int main(int argc, char *argv[])
     thread_data = alloca(sizeof(desprng_individual_t) * Npart);
     process_data = alloca(sizeof(desprng_common_t));
     xi = alloca(8 * Npart);
-    /* coords = alloca(sizeof(struct coord) * Npart); */
 /* #endif */
     /* It looks like it's necessary to allocate memory on the host for create() to work on the device? */
-    /* #pragma acc data copyin(Ntime, Npart, Ncoll)
-    #pragma acc data copy(xaverage, xvariance)
-    #pragma acc enter data create(nident[:Npart], thread_data[:Npart], process_data[:1])
-    #pragma acc enter data create(process_data[0].pc1[:56], process_data[0].pc2[:48], process_data[0].totrot[:16], process_data[0].bytebit[:8], process_data[0].bigbyte[:24]) */
+    //#pragma acc data
+    //#pragma acc data copyin(Npart)
+    //#pragma acc data copy(xi[:Npart])
+    //#pragma acc enter data create(nident[:Npart])
+    //#pragma acc data copyin(Ntime, Npart, Ncoll)
+    //#pragma acc data copy(xaverage, xvariance)
+    //#pragma acc enter data create(nident[:Npart], thread_data[:Npart], process_data[:1])
+    //#pragma acc enter data create(process_data[0].pc1[:56], process_data[0].pc2[:48], process_data[0].totrot[:16], process_data[0].bytebit[:8], process_data[0].bigbyte[:24])
     initialize_common(process_data);
 
     for (itime = 0UL; itime < Ntime; itime++)
@@ -63,7 +65,7 @@ int main(int argc, char *argv[])
                 /* Initialize particle pitch coordinate */
                 xi[ipart] = xi0;
             }
-            #pragma acc loop reduction(+: xaverage, xvariance)
+            #pragma acc loop reduction(+: zaverage, zvariance)
             for (icoll = 0; icoll < Ncoll; icoll++)
             {
                 /* Make itime the high six bytes of icount, and icoll the low two bytes */
