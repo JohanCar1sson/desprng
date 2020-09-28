@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
     desprng_common_t *process_data;
     desprng_individual_t *thread_data;
     double xprn, zeta, czeta, zaverage = 0.0, zvariance = 0.0, dt = 1.0e-2, xt, *xi;
-    /* const */ double xi0 = M_SQRT1_2; /* 45 degree pitch angle */
+    const double xi0 = M_SQRT1_2; /* 45 degree pitch angle */
     int ierr;
     FILE *xidump;
 
@@ -28,7 +28,6 @@ int main(int argc, char *argv[])
     }
     czeta = sqrt(12.); /* PRN normalization constant */
     xt = Ntime * dt;
-
     xidump = fopen("xi.dat", "w");
 
     /* Make some workspace on the stack for the DES PRNGs */
@@ -39,19 +38,15 @@ int main(int argc, char *argv[])
     xi = alloca(8 * Npart);
 /* #endif */
     /* It looks like it's necessary to allocate memory on the host for create() to work on the device? */
-    //#pragma acc data
-    //#pragma acc data copyin(Npart)
-    //#pragma acc data copy(xi[:Npart])
-    //#pragma acc enter data create(nident[:Npart])
-    //#pragma acc data copyin(Ntime, Npart, Ncoll)
-    //#pragma acc data copy(xaverage, xvariance)
-    //#pragma acc enter data create(nident[:Npart], thread_data[:Npart], process_data[:1])
-    //#pragma acc enter data create(process_data[0].pc1[:56], process_data[0].pc2[:48], process_data[0].totrot[:16], process_data[0].bytebit[:8], process_data[0].bigbyte[:24])
+    /* #pragma acc enter data create(nident[:Npart], thread_data[:Npart], process_data[:1])
+    #pragma acc enter data create(process_data[0].pc1[:56], process_data[0].pc2[:48], process_data[0].totrot[:16], process_data[0].bytebit[:8], process_data[0].bigbyte[:24]) */
     initialize_common(process_data);
 
+    #pragma acc data copyout(xi[:Npart]) create(nident[:Npart])
     for (itime = 0UL; itime < Ntime; itime++)
     {
-        #pragma acc parallel
+        /* #pragma acc parallel loop reduction(+: zaverage, zvariance) private(iprn) */
+        #pragma acc serial loop reduction(+: zaverage, zvariance) private(iprn)
         for (ipart = 0UL; ipart < Npart; ipart++)
         {
             if (!itime)
@@ -65,7 +60,6 @@ int main(int argc, char *argv[])
                 /* Initialize particle pitch coordinate */
                 xi[ipart] = xi0;
             }
-            #pragma acc loop reduction(+: zaverage, zvariance)
             for (icoll = 0; icoll < Ncoll; icoll++)
             {
                 /* Make itime the high six bytes of icount, and icoll the low two bytes */
@@ -89,7 +83,6 @@ int main(int argc, char *argv[])
                 xi[ipart] += -2.0 * xi[ipart] * dt / Ncoll + zeta * sqrt(2.0 * (1.0 - xi[ipart] * xi[ipart]) * dt / Ncoll);
             }
         }
-        #pragma acc wait
     }
     /* #pragma acc exit data delete(process_data[0].pc1[:56], process_data[0].pc2[:48], process_data[0].totrot[:16], process_data[0].bytebit[:8], process_data[0].bigbyte[:24])
     #pragma acc exit data delete(nident[:Npart], thread_data[:Npart], process_data[:1]) */
