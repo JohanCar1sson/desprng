@@ -4,10 +4,13 @@ CFLAGS = -g
 LDFLAGS =
 
 #CC = pgcc
-#CFLAGS = -ta=tesla:managed -Minfo
-#LDFLAGS = -ta=tesla:managed
-#CFLAGS = -acc -Minfo
-#LDFLAGS = -acc
+#CC = nvc
+##CFLAGS = -ta=tesla:managed -Minfo
+##LDFLAGS = -ta=tesla:managed
+#CFLAGS = -O2 -fast -acc -Minfo
+#LDFLAGS = -O2 -fast -acc
+#CFLAGS = -fast -acc -Minfo
+#LDFLAGS = -fast -acc
 
 FILES = desprng.h desprng.c toypicmcc.c xiplot.py oldnewcomparison.c d3des.h d3des.c Makefile crush0.c crush1.c crush2.c Makefile.crush
 

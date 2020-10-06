@@ -1,6 +1,5 @@
 #include <limits.h>
 #include "desprng.h"
-#include <stdio.h>
 
 /* These are the signatures for the modified d3des functions that we call directly */
 #pragma acc routine(_deskey) seq
@@ -10,7 +9,7 @@ static void _des(desprng_common_t *process_data, desprng_individual_t *thread_da
 
 /* Takes the 56 least significant bits of an unsigned long and splits them into
    8 groups of 7 bits each. Each group becomes the 7 most signficant bits of a
-   byte (with its least significant bit is set to zero). The result is an
+   byte (with its least significant bit set to zero). The result is an
    identifier in the form of a unique DES key. The implementation should work
    for either endianness, but has only been tested on little-endian systems.
 
@@ -312,8 +311,7 @@ int check_type_sizes()
 
 /* The functions below are modified versions of those in d3des.c
  * The most significant change was getting rid of all global variables
- * that were written to (to make the code thread safe). K&R was changed to
- * ANSI C89, etc.
+ * (to make the code thread safe). K&R was changed to ANSI C89, etc.
  *
  * Johan Carlsson, August 14, 2020
  */
@@ -350,12 +348,6 @@ static void _deskey(desprng_common_t *process_data, desprng_individual_t *thread
     unsigned char pc1m[56], pcr[56];
     unsigned long kn[32];
 
-    /* printf("key[0] = %hu\n", (unsigned short)key[0]); */
-    /* printf("pc1[55] = %hu, pc2[47] = %hu, totrot[15] = %hu\n", (unsigned short)(process_data->pc1[55]), (unsigned short)(process_data->pc2[47]), (unsigned short)(process_data->totrot[15])); */
-    /* pgcc -acc won't compile the next line without the needless explicit cast */
-    /* printf("bytebit[7] = %hu, ", (unsigned short)(process_data->bytebit[7])); */
-    /* pgcc -acc says about the next line: "parse stored value and pointer type do not match" */
-    /* printf("bigbyte[23] = %lu\n", process_data->bigbyte[23]); */
     for (j = 0; j < 56; j++)
     {
         l = process_data->pc1[j];
@@ -385,7 +377,6 @@ static void _deskey(desprng_common_t *process_data, desprng_individual_t *thread
             if (pcr[process_data->pc2[j + 24]]) kn[n] |= process_data->bigbyte[j];
         }
     }
-    /* printf("kn[3] = %lu, kn[31] = %lu\n", kn[3], kn[31]); */
     _cookey(thread_data, kn);
 
     return;
