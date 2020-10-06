@@ -31,21 +31,16 @@ int main(int argc, char *argv[])
     xidump = fopen("xi.dat", "w");
 
     /* Make some workspace on the stack for the DES PRNGs */
-/* #ifndef _OPENACC */
     nident = alloca(8 * Npart);
     thread_data = alloca(sizeof(desprng_individual_t) * Npart);
     process_data = alloca(sizeof(desprng_common_t));
     xi = alloca(8 * Npart);
-/* #endif */
-    /* It looks like it's necessary to allocate memory on the host for create() to work on the device? */
-    /* #pragma acc enter data create(nident[:Npart], thread_data[:Npart], process_data[:1])
-    #pragma acc enter data create(process_data[0].pc1[:56], process_data[0].pc2[:48], process_data[0].totrot[:16], process_data[0].bytebit[:8], process_data[0].bigbyte[:24]) */
+
     initialize_common(process_data);
 
     #pragma acc data copyout(xi[:Npart]) create(nident[:Npart])
     for (itime = 0UL; itime < Ntime; itime++)
     {
-        /* #pragma acc parallel loop reduction(+: zaverage, zvariance) private(iprn) */
         #pragma acc serial loop reduction(+: zaverage, zvariance) private(iprn)
         for (ipart = 0UL; ipart < Npart; ipart++)
         {
@@ -64,7 +59,7 @@ int main(int argc, char *argv[])
             {
                 /* Make itime the high six bytes of icount, and icoll the low two bytes */
 #ifdef _OPENACC
-                icount = itime << 16; icount += icoll; /* Workaround for pgcc compiler bug */
+                icount = itime << 16; icount += icoll; /* Workaround for compiler bug */
 #else
                 icount = (itime << 16) + icoll;
 #endif
@@ -84,9 +79,6 @@ int main(int argc, char *argv[])
             }
         }
     }
-    /* #pragma acc exit data delete(process_data[0].pc1[:56], process_data[0].pc2[:48], process_data[0].totrot[:16], process_data[0].bytebit[:8], process_data[0].bigbyte[:24])
-    #pragma acc exit data delete(nident[:Npart], thread_data[:Npart], process_data[:1]) */
-
     zaverage /= Ntime * Npart * Ncoll;
     zvariance /= Ntime * Npart * Ncoll;
     printf("average = %18.16lf, variance = %18.16lf\n", zaverage, zvariance);
