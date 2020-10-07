@@ -12,16 +12,19 @@ LDFLAGS =
 #CFLAGS = -fast -acc -Minfo
 #LDFLAGS = -fast -acc
 
-FILES = desprng.h desprng.c toypicmcc.c xiplot.py oldnewcomparison.c d3des.h d3des.c Makefile crush0.c crush1.c crush2.c Makefile.crush
+FILES = desprng.h desprng.c des.c toypicmcc.c xiplot.py oldnewcomparison.c d3des.h d3des.c Makefile crush0.c crush1.c crush2.c Makefile.crush
 
 .PHONY : all
 all : libdesprng.a toypicmcc
 
-libdesprng.a : desprng.o
-	ar cr libdesprng.a desprng.o
+libdesprng.a : desprng.o des.o
+	ar cr libdesprng.a desprng.o des.o
 
-desprng.o : desprng.c
+desprng.o : desprng.h desprng.c
 	$(CC) $(CFLAGS) -c desprng.c
+
+des.o : des.c
+	$(CC) $(CFLAGS) -c des.c
 
 toypicmcc : toypicmcc.o libdesprng.a
 	$(CC) -o toypicmcc toypicmcc.o -L. -ldesprng $(LDFLAGS) -lm

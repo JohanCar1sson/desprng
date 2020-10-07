@@ -8,7 +8,7 @@
  * the DIEHARD suite and the 4 tests of FIPS-140-2. The DES PRNG allows up to
  * 2**56 threads to produce uncorrelated PRN sequences with a period of 2**64.
  *
- * See the source file for copyright on the individual functions.
+ * See the source files for copyright and license information.
  *
  * Author: Johan Carlsson
 */

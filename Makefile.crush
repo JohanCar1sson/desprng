@@ -2,16 +2,19 @@ CC = gcc
 CFLAGS = -O2 -ffast-math -finline-functions -funroll-loops -fomit-frame-pointer
 #CFLAGS = -g
 
-FILES = desprng.h desprng.c crush0.c crush1.c crush2.c Makefile.crush
+FILES = desprng.h desprng.c des.c crush0.c crush1.c crush2.c Makefile.crush
 
 .PHONY : all
 all : libdesprng.a crush0 crush1 crush2
 
-libdesprng.a : desprng.o
-	ar cr libdesprng.a desprng.o
+libdesprng.a : desprng.o des.o
+	ar cr libdesprng.a desprng.o des.o
 
-desprng.o : desprng.c
+desprng.o : desprng.h desprng.c
 	$(CC) $(CFLAGS) -c desprng.c
+
+des.o : des.c
+	$(CC) $(CFLAGS) -c des.c
 
 crush0 : crush0.o
 	$(CC) -o crush0 crush0.o -L$(HOME)/local/TestU01-1.2.3/lib64 -ltestu01 -lprobdist -lmylib -lgmp -lm -Wl,-rpath,$(HOME)/local/TestU01-1.2.3/lib64
