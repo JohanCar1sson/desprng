@@ -36,6 +36,7 @@ int main()
 
     gen = ugfsr_CreateMT19937_98(ULONG_MAX >> 1);
     bbattery_SmallCrush(gen);
+    /* bbattery_Crush(gen); */
     ugfsr_DeleteGen(gen);
 
     return 0;

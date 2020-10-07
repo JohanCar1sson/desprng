@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -O2 -ffast-math -finline-functions -funroll-loops -fomit-frame-pointer
-CFLAGS = -g
+#CFLAGS = -g
 LDFLAGS =
 
 #CC = pgcc
