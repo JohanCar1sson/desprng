@@ -1,12 +1,8 @@
 CC = gcc
 CFLAGS = -O2 -ffast-math -finline-functions -funroll-loops -fomit-frame-pointer
-#CFLAGS = -g
 LDFLAGS =
 
-#CC = pgcc
 CC = nvc
-#CFLAGS = -ta=tesla:managed -Minfo
-#LDFLAGS = -ta=tesla:managed
 CFLAGS = -O2 -acc -Minfo
 LDFLAGS = -O2 -acc
 
