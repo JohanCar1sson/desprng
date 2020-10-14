@@ -33,6 +33,7 @@ static void _unscrun(unsigned long *outof, unsigned char *into);
 #pragma acc routine(_desfunc) seq
 static void _desfunc(desprng_common_t *process_data, unsigned long *block, unsigned long *keys);
 
+#pragma acc routine seq
 void _deskey(desprng_common_t *process_data, desprng_individual_t *thread_data, unsigned char *key) /* Thanks to James Gillogly & Phil Karn! */
 {
     int i, j, l, m, n;
@@ -107,6 +108,7 @@ static void _usekey(desprng_individual_t *thread_data, unsigned long *from)
     return;
 }
 
+#pragma acc routine seq
 void _des(desprng_common_t *process_data, desprng_individual_t *thread_data, unsigned char *inblock, unsigned char *outblock)
 {
     unsigned long work[2];

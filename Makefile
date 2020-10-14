@@ -4,13 +4,11 @@ CFLAGS = -O2 -ffast-math -finline-functions -funroll-loops -fomit-frame-pointer
 LDFLAGS =
 
 #CC = pgcc
-#CC = nvc
-##CFLAGS = -ta=tesla:managed -Minfo
-##LDFLAGS = -ta=tesla:managed
-#CFLAGS = -O2 -fast -acc -Minfo
-#LDFLAGS = -O2 -fast -acc
-#CFLAGS = -fast -acc -Minfo
-#LDFLAGS = -fast -acc
+CC = nvc
+#CFLAGS = -ta=tesla:managed -Minfo
+#LDFLAGS = -ta=tesla:managed
+CFLAGS = -O2 -acc -Minfo
+LDFLAGS = -O2 -acc
 
 FILES = desprng.h desprng.c des.c toypicmcc.c xiplot.py oldnewcomparison.c d3des.h d3des.c Makefile crush0.c crush1.c crush2.c Makefile.crush
 
